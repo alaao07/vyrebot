@@ -44,4 +44,12 @@ mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
 
+const birthdayChecker = require('./utils/birthdayChecker');
+const todoReminderChecker = require('./utils/todoReminderChecker');
+
+client.once('ready', () => {
+    birthdayChecker.startBirthdayChecker(client);
+    todoReminderChecker.startTodoReminderChecker(client);
+});
+
 client.login(process.env.DISCORD_TOKEN);
