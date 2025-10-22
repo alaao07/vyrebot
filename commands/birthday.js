@@ -77,6 +77,8 @@ module.exports = {
             return interaction.reply({ content: `Invalid day for month ${month}! This month has only ${daysInMonth} days.`, ephemeral: true });
         }
 
+        await interaction.deferReply();
+
         try {
             await Birthday.findOneAndUpdate(
                 { userId: targetUser.id, guildId: interaction.guildId },
@@ -111,10 +113,10 @@ module.exports = {
                 .setThumbnail(targetUser.displayAvatarURL())
                 .setFooter({ text: 'You will receive reminders 1 day and 1 hour before!' });
 
-            await interaction.reply({ embeds: [embed] });
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             console.error('Error adding birthday:', error);
-            await interaction.reply({ content: 'Failed to add birthday. Please try again!', ephemeral: true });
+            await interaction.editReply({ content: 'Failed to add birthday. Please try again!' });
         }
     },
 
@@ -125,13 +127,15 @@ module.exports = {
             return interaction.reply({ content: 'You need administrator permissions to remove birthdays for other users!', ephemeral: true });
         }
 
+        await interaction.deferReply();
+
         const result = await Birthday.findOneAndDelete({
             userId: targetUser.id,
             guildId: interaction.guildId
         });
 
         if (!result) {
-            return interaction.reply({ content: `No birthday found for ${targetUser.username}!`, ephemeral: true });
+            return interaction.editReply({ content: `No birthday found for ${targetUser.username}!` });
         }
 
         const embed = new EmbedBuilder()
@@ -139,14 +143,16 @@ module.exports = {
             .setTitle('🗑️ Birthday Removed')
             .setDescription(`Birthday for ${targetUser.username} has been removed.`);
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 
     async listBirthdays(interaction) {
+        await interaction.deferReply();
+
         const birthdays = await Birthday.find({ guildId: interaction.guildId }).sort({ month: 1, day: 1 });
 
         if (birthdays.length === 0) {
-            return interaction.reply({ content: 'No birthdays have been added yet!', ephemeral: true });
+            return interaction.editReply({ content: 'No birthdays have been added yet!' });
         }
 
         const now = new Date();
@@ -176,11 +182,12 @@ module.exports = {
             .setFooter({ text: `${birthdays.length} total birthdays registered` })
             .setTimestamp();
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 
     async showCalendar(interaction) {
         const currentMonth = new Date().getMonth() + 1;
+        await interaction.deferReply();
         await this.displayMonthCalendar(interaction, currentMonth);
     },
 
