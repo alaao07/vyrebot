@@ -26,7 +26,9 @@ module.exports = {
             option.setName('context')
                 .setDescription('Additional context (optional)')
                 .setRequired(false)
-        ),
+        )
+        .setIntegrationTypes([0, 1])
+        .setContexts([0, 1, 2]),
     
     async execute(interaction) {
         await interaction.deferReply();
@@ -68,13 +70,13 @@ Keep responses concise but informative. Use formatting when helpful.`;
                 await interaction.editReply(text);
             }
             
-            console.log(`✅ AI response sent to ${interaction.user.tag}`);
+            const location = interaction.guild ? `in ${interaction.guild.name}` : 'in DMs';
+            console.log(`✅ AI response sent to ${interaction.user.tag} ${location}`);
             
         } catch (error) {
             console.error('Gemini API Error:', error);
             await interaction.editReply({
-                content: '❌ Sorry, I encountered an error processing your question. Please try again later.',
-                ephemeral: true
+                content: '❌ Sorry, I encountered an error processing your question. Please try again later.'
             });
         }
     }
