@@ -5,8 +5,9 @@ module.exports = {
         const [, , monthStr] = interaction.customId.split('_');
         const month = parseInt(monthStr);
 
+        await interaction.deferUpdate();
+
         const birthdayCommand = require('../commands/birthday');
         await birthdayCommand.displayMonthCalendar(interaction, month);
-        await interaction.deferUpdate();
     }
 };
